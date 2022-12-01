@@ -50,3 +50,6 @@ body {
   justify-content: space-around;
 }
 
+.scores-list {
+  text-align:center;
+}
