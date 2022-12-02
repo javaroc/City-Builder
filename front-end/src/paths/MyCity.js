@@ -12,8 +12,6 @@ class City extends React.Component {
   }
   
   advanceStep(event) {
-    this.setState({money: this.state.money + 100});
-    this.setState({day: this.state.day + 1});
   }
   
   buildFactory(event) {
@@ -45,7 +43,7 @@ class City extends React.Component {
             </div>
             <div class="money">
               <p>MONEY: {this.state.money} coins</p>
-              <p>POPULATION: {this.state.population} people</p>  
+              <p>UNEMPLOYED POPULATION: {this.state.population} people</p>  
             </div>
           </div>
           <div class="build">

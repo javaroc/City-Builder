@@ -23,7 +23,7 @@ function Leaderboard() {
       {name: "Chatham", score: 200}
       ]
     )
-    console.log(scores)
+    //console.log(scores)
   }, []);
   
   return (
