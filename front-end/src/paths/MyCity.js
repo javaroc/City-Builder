@@ -1,68 +1,128 @@
+import { useState, useEffect } from 'react';
 import React from "react";
+import axios from 'axios';
+/* global axios */
 
 
-class City extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {name: 'Name Me', money: 0, population: 0, day: 0};
-    this.advanceStep = this.advanceStep.bind(this);
-    this.buildFactory = this.buildFactory.bind(this);
-    this.buildHouse = this.buildHouse.bind(this);
-    this.endGame = this.endGame.bind(this);
-  }
+function City() {
+  const [name, setName] = useState("Name me");
+  const [money, setMoney] = useState(0);
+  const [unemployed, setUnemployed] = useState(0);
+  const [factoryCount, setFactoryCount] = useState(0);
+  const [houseCount, setHouseCount] = useState(0);
   
-  advanceStep(event) {
-  }
+  const fetchGameState = async() => {
+    try {      
+      console.log("Fetching state,");
+      const response = await axios.get("/citybuilder/gamestate");
+      console.log(response.data);
+      setName(response.data.cityName);
+      setMoney(response.data.money);
+      setUnemployed(response.data.unemployed);
+      setFactoryCount(response.data.buildingCounts.factoryCount);
+      setHouseCount(response.data.buildingCounts.houseCount);
+    } catch(error) {
+      console.log("error retrieving tasks: " + error);
+    }
+  };
   
-  buildFactory(event) {
-    this.setState({money: this.state.money - 500});
-  }
+  const changeName = async(event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post("/citybuilder/name/" + name);
+      setName(response.data.cityName);
+    } catch(error) {
+      console.log("error changing name: " + error);
+    }
+    
+  };
   
-  buildHouse(event) {
-    this.setState({money: this.state.money - 200 });
-    this.setState({population: this.state.population +5});
-  }
+  const advanceStep = async (event) => {
+    event.preventDefault();
+    try {
+      await axios.post("/citybuilder/nextday");
+      fetchGameState();
+    } catch (error) {
+      console.log("error advancing step: " + error);
+    }
+  };
   
-  endGame(event) {
+  const buildFactory = async (event) => {
+    event.preventDefault();
+    try {
+      await axios.post("/citybuilder/build/factory");
+      fetchGameState();
+    } catch (error) {
+      console.log("error building factory: " + error);
+    }
+  };
+  
+  const buildHouse = async (event) => {
+    event.preventDefault();
+    try {
+      await axios.post("/citybuilder/build/house");
+      fetchGameState();
+    } catch (error) {
+      console.log("error building house: " + error);
+    }
+  };
+  
+  const endGame = (event) => {
     //TODO request to server
-  }
+  };
   
   
+  useEffect(() => {
+    fetchGameState();
+  }, []);
   
-  render() {
-    return (
-    <div class='content'>
-      <div class='game-window'>
+  
+  return (
+    <div className='content'>
+      <div className='game-window'>
         <h2>City Builder</h2>
-        <div class="current-game">
-          <h3>{this.state.name}</h3>
-          <hr/>
-          <div class="buildings-and-money">
-            <div class="buildings">
-              <p>BUILDINGS: </p>
+        <div className="current-game">
+          <form onSubmit={changeName}>
+            <div>
+              <label>
+                Name:
+                <input type="text" value={name}
+                  onChange={e => setName(e.target.value)} />
+              </label>
             </div>
-            <div class="money">
-              <p>MONEY: {this.state.money} coins</p>
-              <p>UNEMPLOYED POPULATION: {this.state.population} people</p>  
+            <input type="submit" value="Submit" />
+          </form>
+          <hr/>
+          <div className="buildings-and-money">
+            <div className="buildings">
+              <p>BUILDINGS:</p>
+              <div className="building-row">
+                <p>factories: {factoryCount}</p>
+              </div>
+              <div className="building-row">
+                <p>houses: {houseCount}</p>
+              </div>
+            </div>
+            <div className="money">
+              <p>MONEY: {money} coins</p>
+              <p>UNEMPLOYED POPULATION: {unemployed} people</p>  
             </div>
           </div>
-          <div class="build">
-            <button onClick={this.buildFactory}>Build factory</button>
-            <button onClick={this.buildHouse}>Build house</button>
+          <div className="build">
+            <button onClick={buildFactory}>Build factory</button>
+            <button onClick={buildHouse}>Build house</button>
           </div>
         </div>
       </div>
-      <div class='footer-buttons'>
-        <button onClick={this.advanceStep}>Next day</button>
-        <button onClick={this.endGame}>End game</button>
+      <div className='footer-buttons'>
+        <button onClick={advanceStep}>Next day</button>
+        <button onClick={endGame}>End game</button>
       </div>
       <footer>
       <p>Site made by Zach Hacking and Alyssa Rogers</p>
       </footer>
     </div>
-  
-    );
-  }
+  )
 }
 
 export default City;

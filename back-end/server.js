@@ -28,6 +28,7 @@ const Score = mongoose.model('Score', {
 });
 
 // Initialize lookup table
+LookupBuilding.deleteMany({});
 const factory = new LookupBuilding({
     name: 'factory',
     moneyCost: 300,
@@ -44,6 +45,7 @@ factory.save();
 house.save();
 
 //Initialize building count table
+BuiltBuilding.deleteMany({});
 const factoryCount = new BuiltBuilding({
     name: 'factory',
     count: 0
@@ -56,9 +58,9 @@ factoryCount.save();
 houseCount.save();
 
 
-const DEFAULT_NAME = "";
-let unemployed = 0;
-let money = 0;
+const DEFAULT_NAME = "New City";
+let unemployed = 20;
+let money = 500;
 let cityName = DEFAULT_NAME;
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -68,12 +70,12 @@ app.use(bodyParser.urlencoded({
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/citybuilder/gamestate', (req, res) => {
-    
+app.get('/citybuilder/gamestate', async (req, res) => {
+    console.log("Handling GET /gamestate");
     //TODO MONGO
-    let factoryCount = BuiltBuilding.findOne({ name: 'factory' }).select('count');
-    let houseCount = BuiltBuilding.findOne({ name: 'house' }).select('count');
-    res.send ({
+    let factoryCount = (await BuiltBuilding.findOne({ name: 'factory' }).select('count')).count;
+    let houseCount = (await BuiltBuilding.findOne({ name: 'house' }).select('count')).count;
+    let returnObject = {
         cityName: cityName,
         money: money,
         unemployed: unemployed,
@@ -81,30 +83,37 @@ app.get('/citybuilder/gamestate', (req, res) => {
             factoryCount: factoryCount,
             houseCount: houseCount
         }
-    });
+    };
+    console.log(returnObject);
+    res.send(returnObject);
 });
 
 app.post('/citybuilder/name/:name', (req,res) =>{
+    console.log("Handling POST /name");
     cityName = req.params.name;
     res.send({
         cityName: cityName
     });
 });
-app.post('/citybuilder/nextday', (req,res) =>{
-    this.setState({money: this.state.money + 100});
-    this.setState({day: this.state.day + 1});
+app.post('/citybuilder/nextday', async (req,res) =>{
+    console.log("Handling POST /nextday");
     money += 100; // Flat income
     // Add income for buildings
-    let buildingCounts = BuiltBuilding.find();
-    buildingCounts.forEach((row) => {
-        let incomePer = LookupBuilding.findOne({name: row.name}).select('income');
+    let buildingCounts = await BuiltBuilding.find();
+    console.log(buildingCounts.length);
+    buildingCounts.forEach(async (row) => {
+        // console.log("row:")
+        // console.log(row);
+        let incomePer = (await LookupBuilding.findOne({name: row.name}).select('income')).income;
+        // console.log(incomePer)
         money += row.count * incomePer;
     });
     res.sendStatus(200);
 });
-app.post('/citybuilder/build/:buildingType', (req, res) => {
-    let buildingType = buildingType;
-    let buildingProperties = LookupBuilding.findOne({'name': buildingType});
+app.post('/citybuilder/build/:buildingType', async (req, res) => {
+    console.log("Handling POST /build");
+    let buildingType = req.params.buildingType;
+    let buildingProperties = await LookupBuilding.findOne({'name': buildingType});
     //take away money
     if (unemployed < buildingProperties.populationCost) {
         res.status(400)
@@ -124,7 +133,7 @@ app.post('/citybuilder/build/:buildingType', (req, res) => {
     //res.send both vars
     res.sendStatus(200);
 });
-app.post('citybuilder/endgame', (req, res) => {
+app.post('/citybuilder/endgame', async (req, res) => {
     //send city to mongo database;
     //reset currentcity to new
     const newScore = new Score({
@@ -140,9 +149,9 @@ app.post('citybuilder/endgame', (req, res) => {
     
     res.sendStatus(200);
 });
-app.get('/citybuilder/scores', (req, res) => {
+app.get('/citybuilder/scores', async (req, res) => {
     //call all cities in database 
-    res.send(Score.find());
+    res.send(await Score.find());
 });
 
-app.listen(3000, () => console.log('Server listening on port 3000!'));
+app.listen(3005, () => console.log('Server listening on port 3005!'));
