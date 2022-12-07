@@ -67,8 +67,15 @@ function City() {
     }
   };
   
-  const endGame = (event) => {
-    //TODO request to server
+  const endGame = async (event) => {
+    event.preventDefault();
+    try {
+      await axios.post("/citybuilder/endgame");
+      fetchGameState();
+      
+    }catch (error) {
+      console.log("error ending game: " + error);
+    }
   };
   
   
@@ -80,16 +87,16 @@ function City() {
   return (
     <div className='content'>
       <div className='game-window'>
-        <h2>City Builder</h2>
+        <h2>{name}</h2>
         <div className="current-game">
           <form onSubmit={changeName}>
-            <div>
+            
               <label>
-                Name:
-                <input type="text" value={name}
+                Rename:
+                <input className='name-input' type="text" value={name}
                   onChange={e => setName(e.target.value)} />
               </label>
-            </div>
+            
             <input type="submit" value="Submit" />
           </form>
           <hr/>
@@ -119,7 +126,8 @@ function City() {
         <button onClick={endGame}>End game</button>
       </div>
       <footer>
-      <p>Site made by Zach Hacking and Alyssa Rogers</p>
+      <p>Site made by Zach Hacking and Alyssa Rogers <a
+          href="https://github.com/javaroc/City-Builder">repository</a></p>
       </footer>
     </div>
   )

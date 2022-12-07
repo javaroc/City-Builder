@@ -3,53 +3,62 @@ body {
   padding: 0;
 }
 
+
+.name-input {
+  width: 100%;
+}
 .content {
-  border: 3px dotted green;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .game-window {
-  border: 3px solid red;
-  width: 50vw;
+  padding: 25px;
+  border: 3px solid black;
+  width: 60vw;
   text-align: center;
 }
 
 .current-game {
-  border: 3px solid cyan;
 }
 
 .buildings-and-money {
-  border: 3px solid brown;
+  border: 3px solid grey;
   display: flex;
   flex-direction: row;
 }
 
 .buildings {
-  border: 3px solid green;
-  flex: 2;
+  flex: 1;
 }
 
 .money {
-  border: 3px solid purple;
   flex: 1;
 }
 
 .build {
-  border: 3px solid yellow;
   display: flex;
   justify-content: space-between;
+  margin-top: 25px;
 }
 
 .footer-buttons {
-  margin-top: 2vw;
-  border: 3px solid purple;
+  margin-top: 4vw;
   display: flex;
   width: 100%;
   justify-content: space-around;
 }
 
-.scores-list {
+.leaderboard-page {
   text-align:center;
+}
+
+.scores-list {
+  height: 75vh;
+  display: flex;
+  border: 3px solid black;
+  
+  flex-direction: column;
+  justify-content: center;
 }

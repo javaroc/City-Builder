@@ -128,8 +128,8 @@ app.post('/citybuilder/build/:buildingType', async (req, res) => {
     unemployed -= buildingProperties.populationCost;
     money -= buildingProperties.moneyCost;
     
-    let oldCount = BuiltBuilding.findOne({name: buildingType}).select('count');
-    BuiltBuilding.updateOne({name: req.params.buildingType}, {count: oldCount + 1});
+    let oldCount = (await BuiltBuilding.findOne({name: buildingType})).count;
+    await BuiltBuilding.updateOne({name: req.params.buildingType}, {count: oldCount + 1});
     //res.send both vars
     res.sendStatus(200);
 });
@@ -142,11 +142,11 @@ app.post('/citybuilder/endgame', async (req, res) => {
     });
     newScore.save();
     
+    await BuiltBuilding.updateMany({}, { count: 0});
+    
     unemployed = 0;
     money = 0;
     cityName = DEFAULT_NAME;
-    BuiltBuilding.updateMany({}, { count: 0});
-    
     res.sendStatus(200);
 });
 app.get('/citybuilder/scores', async (req, res) => {

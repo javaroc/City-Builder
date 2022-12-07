@@ -10,7 +10,7 @@ import './App.css';
 
 function App() {
   return (
-    <BrowserRouter basename="">
+    <BrowserRouter basename="/creative-projects/citybuilder/front-end/build/">
       <Routes>
         <Route path="/" element={<Navbar/>}>
           <Route index element={<City/>}/>
